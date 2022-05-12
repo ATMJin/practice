@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <!-- 引入 Vue -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+
+  <style>
+    /* 防止API資料未讀取並渲染完前顯示空白{{}} */
+    [v-cloak] {
+      display: none;
+    }
+
+    .result {
+      margin-top: 10px;
+    }
+
+    .resultitem {
+      /* 橫向排列 */
+      display: inline-block;
+      border: 1px solid #000;
+      padding: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+
+    <div class="topbar">
+      <span>tell me what do you want : </span>
+      <!-- 綁定search變數 -->
+      <input type="text" class="search" v-model="search">
+    </div>
+
+    <div class="result">
+      <!-- 迴圈渲染，使用正則表達式模糊查詢 -->
+      <div class="resultitem" v-cloak v-for="item in items" v-if="searchReg.test(item)">{{item}}</div>
+    </div>
+
+  </div>
+
+  <script>
+    new Vue({
+      el: "#app",
+      data: {
+        search: "",
+        items: [],
+      },
+      computed: {
+        searchReg() {
+          // 建立正則表達式，修飾符i代表不分大小寫
+          return new RegExp(this.search, "i")
+        }
+      },
+      beforeMount() {
+        // 獲取API資料
+        fetch("https://api.publicapis.org/categories")
+          .then(res => res.json())
+          .then(data => {
+            this.items = data.categories
+          })
+          .catch(err => console.log(err))
+      },
+    })
+  </script>
+</body>
+
+</html>

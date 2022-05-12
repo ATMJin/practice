@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <!-- 引入 Vue -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+
+  <style>
+    /* 簡易CSS歸零 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* 消除div之間間隔 */
+    body {
+      font-size: 0;
+    }
+
+    .flex {
+      width: 100%;
+      height: 100vh;
+      /* 內部橫向排列 */
+      display: flex;
+      flex-direction: row;
+    }
+
+    .col {
+      height: 100%;
+      border: 1px solid #000;
+      font-size: 16px;
+      /* 寬度不可壓縮 */
+      flex-shrink: 0;
+    }
+
+    .col1 {
+      width: 200px;
+    }
+
+    .col2 {
+      /* 寬度可壓縮 */
+      flex-shrink: 1;
+      /* 使用剩餘寬度 */
+      flex-grow: 1;
+      /* 卷軸 */
+      overflow: auto;
+      /* 最小寬度 */
+      min-width: 100px;
+    }
+
+    .col3 {
+      width: 300px;
+    }
+
+    .w600 {
+      width: 600px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app" class="flex">
+
+    <div class="col col1">
+      <!-- 綁定inputNumber變數，建立keyup事件監聽，使用alwaysNumber函式並傳入事件物件 -->
+      <input type="text" class="inputNumber" v-model.number="inputNumber" @keyup="alwaysNumber($event)">
+    </div>
+
+    <div class="col col2">
+      <div class="w600">
+        <!-- 選擇數學模式 -->
+        <select @change="computeMath($event)">
+          <option value="isPrime">isPrime</option>
+          <option value="isFibonacci">isFibonacci</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="col col3">
+      <!-- 顯示結果 -->
+      <p class="outputResult">{{result}}</p>
+    </div>
+  </div>
+
+  <script>
+    new Vue({
+      el: "#app",
+      data: {
+        // 輸入數字
+        inputNumber: "",
+        // 數學模式
+        mathMod: "isPrime",
+        // 計算結果
+        result: "",
+      },
+      computed: {
+        // 建立一費式數列
+        Fibo() {
+          let arr = [1, 1];
+          for (let i = 2; i <= 100; i++) {
+            arr[i] = arr[i - 1] + arr[i - 2];
+          }
+
+          let sum = ""
+          arr = arr.map(i => i.toString())
+          for (let i = 0; i < arr.length; i++) {
+            sum += arr[i]
+          }
+          return sum
+        }
+      },
+      methods: {
+        // 輸入欄永遠數字
+        alwaysNumber(e) {
+          e.target.value = this.inputNumber
+          if (typeof this.inputNumber == "string") {
+            e.target.value = ""
+          }
+          this.computeMath(this.mathMod)
+        },
+        // 計算結果
+        computeMath(e) {
+          // 判斷從select或是input調用函式
+          if (e.target) {
+            mod = e.target.value;
+            this.mathMod = mod
+          } else {
+            mod = e
+          }
+          // 判斷使用模式
+          switch (mod) {
+            case "isPrime":
+              this.result = this.isPrime()
+              break;
+            case "isFibonacci":
+              this.result = this.isFibonacci()
+              break;
+            default:
+              break;
+          }
+        },
+        // 判斷質數
+        isPrime() {
+          let num = this.inputNumber
+          for (let i = 2; i < Math.sqrt(num); i++) {
+            if (num % i == 0) {
+              return false;
+            }
+          }
+          return true;
+        },
+        // 判斷費式數列
+        isFibonacci() {
+          // 利用輸入數字建立正則式
+          let reg = new RegExp(`^${this.inputNumber}`)
+          // 利用預先建立的大數費式數列判斷是否輸入費式數列
+          if (reg.test(this.Fibo)) {
+            return true
+          }
+          return false
+        },
+      },
+    })
+  </script>
+</body>
+
+</html>
